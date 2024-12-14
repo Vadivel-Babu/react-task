@@ -4,13 +4,15 @@ import TaskList from "./components/TaskList";
 import { Button, Modal, notification, Spin } from "antd";
 import TaskForm from "./components/TaskForm";
 import { Task } from "./type";
+import EditTaskForm from "./components/EditTaskForm";
 
 function App() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [api, contextHolder] = notification.useNotification();
+  const [editTask, setEditTask] = useState<Task | null>(null);
 
   //fetching task from server
   async function getTasks() {
@@ -28,24 +30,20 @@ function App() {
   //deleting task
   async function removeTask(id: string) {
     try {
-      //setDeleteLoading(true);
-      const task = await deleteTask(id);
+      await deleteTask(id);
       let newTask = tasks.filter((task: Task) => task.id !== id);
-      console.log(task);
 
       api.success({
         message: `Task Deletes successfully`,
         placement: "top",
       });
-      setDeleteLoading(false);
+
       setTasks(newTask);
     } catch (error) {
       api.error({
         message: `Task cannot be deleted`,
         placement: "top",
       });
-      setDeleteLoading(false);
-      console.log(error);
     }
   }
 
@@ -76,8 +74,9 @@ function App() {
       ) : (
         <TaskList
           data={tasks}
-          deleteLoading={deleteLoading}
           removeTask={removeTask}
+          handleEditModal={setEditModalOpen}
+          handleTask={setEditTask}
         />
       )}
 
@@ -97,6 +96,38 @@ function App() {
           handleModel={setIsModalOpen}
           handleTask={setTasks}
           tasks={tasks}
+        />
+      </Modal>
+      <Modal
+        title="Edit Form"
+        open={isEditModalOpen}
+        onOk={() => {
+          setEditTask(null);
+          setEditModalOpen(false);
+        }}
+        onCancel={() => {
+          setEditTask(null);
+          setEditModalOpen(false);
+        }}
+        footer={[
+          <Button
+            key="back"
+            onClick={() => {
+              setEditTask(null);
+              setEditModalOpen(false);
+            }}
+          >
+            cancel
+          </Button>,
+        ]}
+        className="overflow-x-hidden"
+      >
+        <EditTaskForm
+          handleTask={setTasks}
+          tasks={tasks}
+          handleModel={setEditModalOpen}
+          //@ts-ignore
+          editTask={editTask}
         />
       </Modal>
     </div>

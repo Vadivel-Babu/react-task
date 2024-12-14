@@ -9,60 +9,76 @@ import {
   Switch,
 } from "antd";
 import type { NotificationArgsProps } from "antd";
-import { useState } from "react";
-import { postTask } from "../api/service";
+import { useEffect, useState } from "react";
+import { Task } from "../type";
+import { updateTask } from "../api/service";
+import moment from "moment";
 
 //@ts-ignore
 type NotificationPlacement = NotificationArgsProps["placement"];
 
 type FieldType = {
-  tasktitle?: string;
-  duedate?: string;
-  status?: boolean;
-  priority: string;
+  newTasktitle?: string;
+  newDuedate?: string;
+  newStatus?: boolean;
+  newPriority: string;
 };
 
-const TaskForm = ({
+const EditTaskForm = ({
   handleModel,
   handleTask,
+  editTask,
   tasks,
 }: {
   handleModel: (e: boolean) => void;
   handleTask: (data: any) => void;
   tasks: any[];
+  editTask: Task;
 }) => {
   const [api, contextHolder] = notification.useNotification();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
+
+  //formatting date to set value in datepicker field
+  const formattedDate = moment(editTask?.duedate, "DD/MM/YYYY");
+
+  //submitting updated value
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     //@ts-ignore
-    let date = new Date(values?.duedate?.$d);
+    let date = new Date(values?.newDuedate?.$d);
     let formated = `${date.getDate()}/${
       date.getMonth() + 1
-    }/ ${date.getFullYear()}`;
+    }/${date.getFullYear()}`;
 
     const data = {
-      tasktitle: values.tasktitle,
-      priority: values.priority,
+      id: editTask.id,
+      tasktitle: values.newTasktitle,
+      priority: values.newPriority,
       duedate: formated,
-      status: values.status,
+      status: values.newStatus,
     };
 
     try {
       setLoading(true);
       //@ts-ignore
-      const res = await postTask(data);
+      const res = await updateTask(data);
       handleModel(false);
       setLoading(false);
       api.success({
-        message: `Task created successfully`,
+        message: `Task Updated successfully`,
         placement: "top",
       });
-      handleTask([...tasks, data]);
+      const newTasks = tasks.map((task) => {
+        if (task.id === editTask.id) {
+          task = data;
+        }
+        return task;
+      });
+      handleTask(newTasks);
       form.resetFields();
     } catch (error) {
       api.error({
-        message: `cannot create task`,
+        message: `cannot update task`,
         placement: "top",
       });
       setLoading(false);
@@ -70,6 +86,16 @@ const TaskForm = ({
       form.resetFields();
     }
   };
+
+  //setting data for input to edit
+  useEffect(() => {
+    form.setFieldsValue({
+      newTasktitle: editTask?.tasktitle,
+      newPriority: editTask?.priority,
+      newStatus: editTask?.status,
+      newDuedate: formattedDate,
+    });
+  }, [editTask]);
   return (
     <>
       {contextHolder}
@@ -80,10 +106,10 @@ const TaskForm = ({
         wrapperCol={{ span: 8 }}
         style={{ maxWidth: 600 }}
         initialValues={{
-          tasktitle: "",
-          priority: "",
-          status: false,
-          duedate: null,
+          newTasktitle: editTask?.tasktitle,
+          newPriority: editTask?.priority,
+          newStatus: editTask?.status,
+          newDuedate: formattedDate,
         }}
         onFinish={onFinish}
         onFinishFailed={() =>
@@ -97,7 +123,7 @@ const TaskForm = ({
       >
         <Form.Item<FieldType>
           label="Task Title"
-          name="tasktitle"
+          name="newTasktitle"
           rules={[
             { required: true, message: "Please enter title!" },
             { whitespace: true },
@@ -109,7 +135,7 @@ const TaskForm = ({
         </Form.Item>
         <Form.Item
           label="Select"
-          name="priority"
+          name="newPriority"
           rules={[{ required: true, message: "Please select value!" }]}
         >
           <Select>
@@ -118,12 +144,12 @@ const TaskForm = ({
             <Select.Option value="low">Low</Select.Option>
           </Select>
         </Form.Item>
-        <Form.Item label="Status" name="status">
+        <Form.Item label="Status" name="newStatus">
           <Switch />
         </Form.Item>
         <Form.Item
           label="Due Date"
-          name="duedate"
+          name="newDuedate"
           rules={[{ required: true, message: "Please input!" }]}
         >
           <DatePicker />
@@ -131,7 +157,7 @@ const TaskForm = ({
 
         <Form.Item label={null}>
           <Button type="primary" loading={loading} htmlType="submit">
-            Submit
+            Update
           </Button>
         </Form.Item>
       </Form>
@@ -139,4 +165,4 @@ const TaskForm = ({
   );
 };
 
-export default TaskForm;
+export default EditTaskForm;
