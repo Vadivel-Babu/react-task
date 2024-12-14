@@ -1,50 +1,19 @@
-# React + TypeScript + Vite
+# Task Management Web App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a simple task management web application built using react,tailwind,ant design and mockApi. It allows users to create, delete, and update. The tasks are stored in server, ensuring that users can access their task even after refreshing the page or closing the browser.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Add Task: Users can add new task items to the list by entering a task and pressing the "Add" button.
+- Delete Task: Users can delete task by clicking on the delete button next to each item.
+- Edit Task: Users can edit and update the task.
+- Mark as Completed: Users can mark task as completed by using switch button.
 
-## Expanding the ESLint configuration
+## Usage
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- Clone the repository to your local machine.
+- run the command in terminal npm i.
+- then npm run dev.
+- Use the input field to add new task items.
+- Click on the delete button to remove task items.
+- Click on the checkbox to mark task items as completed.

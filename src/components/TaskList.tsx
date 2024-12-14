@@ -96,7 +96,7 @@ const TaskList = ({
     key: item.id, // Use 'id' as the unique key
   }));
   return (
-    <div className="container-lg mx-auto max-w-[700px] mt-10">
+    <div className="container-lg mx-auto max-w-[700px] mt-10 px-2">
       <Table<DataType>
         columns={columns}
         dataSource={dataSource}
